@@ -1,3 +1,5 @@
+// internal/config/config.go
+
 package config
 
 import (
@@ -6,7 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// LoadEnv loads environment variables from a .env file
+// สร้างโครงสร้าง Config เพื่อเก็บค่าการตั้งค่าต่างๆ
 type Config struct {
 	AppEnv       string
 	AppPort      string
