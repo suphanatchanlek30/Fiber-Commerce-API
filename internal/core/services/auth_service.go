@@ -46,6 +46,7 @@ func (s *AuthServiceImpl) Register(req entities.RegisterRequest) (*entities.User
 		IsActive:  true,              // กำหนดสถานะเป็น Active
 	}
 
+	// เรียกใช้ userRepo เพื่อบันทึก user ใหม่
 	err = s.userRepo.Create(user)
 	if err != nil {
 		return nil, err
@@ -59,10 +60,13 @@ func (s *AuthServiceImpl) Register(req entities.RegisterRequest) (*entities.User
 func (s *AuthServiceImpl) Login(req entities.LoginRequest) (*entities.LoginResponse, error) {
 
 	user, err := s.userRepo.GetByEmail(req.Email)
+
+	// Check if user exists
 	if err != nil {
 		return nil, errors.New("invalid email or password")
 	}
 
+	// Check if user is active
 	if !user.IsActive {
 		return nil, errors.New("account is deactivated")
 	}
@@ -78,7 +82,7 @@ func (s *AuthServiceImpl) Login(req entities.LoginRequest) (*entities.LoginRespo
 		return nil, errors.New("failed to generate token")
 	}
 
-	// retunr login response
+	// return login response
 	return &entities.LoginResponse{
 		Token: token,
 		User:  *user,
