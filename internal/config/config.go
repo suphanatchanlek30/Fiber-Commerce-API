@@ -27,8 +27,8 @@ type Config struct {
 func LoadConfig() (*Config, error) {
 	return &Config{
 		AppEnv:       getEnv("APP_ENV", "development"),
-		AppPort:      getEnv("APP_PORT", "8080"),
-		AppURL:       getEnv("APP_URL", "http://localhost:8080"),
+		AppPort:      getEnv("APP_PORT", "3000"),
+		AppURL:       getEnv("APP_URL", "http://localhost:3000"),
 		DBHost:       getEnv("DB_HOST", "localhost"),
 		DBPort:       getEnv("DB_PORT", "5432"),
 		DBUser:       getEnv("DB_USER", "postgres"),
