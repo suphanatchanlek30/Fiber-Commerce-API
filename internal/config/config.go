@@ -32,7 +32,7 @@ func LoadConfig() (*Config, error) {
 		DBHost:       getEnv("DB_HOST", "localhost"),
 		DBPort:       getEnv("DB_PORT", "5432"),
 		DBUser:       getEnv("DB_USER", "postgres"),
-		DBPassword:   getEnv("DB_PASS", "your_password_here"),
+		DBPassword:   getEnv("DB_PASS", "arm0612601997"),
 		DBName:       getEnv("DB_NAME", "fiberecomapidb"),
 		DBSSLMode:    getEnv("DB_SSL", "disable"),
 		JWTSecret:    getEnv("JWT_SECRET", "fibernextcommerce_jwt_secret_key_2024"),
