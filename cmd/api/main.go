@@ -3,24 +3,56 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/suphanatchanlek30/fiber-commerce-api/internal/adapters/http/handlers"
+	"github.com/suphanatchanlek30/fiber-commerce-api/internal/adapters/http/routes"
+	"github.com/suphanatchanlek30/fiber-commerce-api/internal/adapters/persistence/repositories"
+	"github.com/suphanatchanlek30/fiber-commerce-api/internal/config"
+	"github.com/suphanatchanlek30/fiber-commerce-api/internal/core/services"
 )
 
 func main() {
 
-	// Create a new Fiber app
-	app := fiber.New()
+	// Load configurations
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("Error loading config: %v", err)
+	}
 
-	// Define a simple route
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
+	// Setup database connection
+	db := config.SetupDatabase(cfg)
+
+	// Initialize repositories
+	userRepo := repositories.NewUserRepository(db)
+
+	// Initialize services
+	authService := services.NewAuthService(userRepo)
+
+	// Initialize handlers
+	authHandler := handlers.NewAuthHandler(authService)
+
+	// Initialize Fiber app
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		},
 	})
 
-	// Start the server on port 3000
-	if err := app.Listen(":3000"); err != nil {
-		fmt.Println("Error starting server:", err)
-	}
+	// Middleware
+	app.Use(logger.New())
+	app.Use(cors.New())
+
+	// Setup routes
+	routes.SetupRoutes(app, authHandler)
+
+	// Start server
+	log.Printf("Server starting on port %s", cfg.AppPort)
+	log.Fatal(app.Listen(":" + cfg.AppPort))
 
 }

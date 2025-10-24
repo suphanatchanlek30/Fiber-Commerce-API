@@ -24,7 +24,7 @@ type Config struct {
 }
 
 // LoadEnv โหลดตัวแปรสภาพแวดล้อมจากไฟล์ .env
-func LoadEnv() (*Config, error) {
+func LoadConfig() (*Config, error) {
 	return &Config{
 		AppEnv:       getEnv("APP_ENV", "development"),
 		AppPort:      getEnv("APP_PORT", "8080"),
