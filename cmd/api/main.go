@@ -22,6 +22,8 @@ package main
 import (
 	"log"
 
+	_ "github.com/suphanatchanlek30/fiber-commerce-api/docs"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -36,6 +38,8 @@ func main() {
 
 	// Load configurations
 	cfg, err := config.LoadConfig()
+
+	// ตรวจสอบข้อผิดพลาดในการโหลดการตั้งค่า
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}
