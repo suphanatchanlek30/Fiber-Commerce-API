@@ -42,6 +42,15 @@ type RegisterRequest struct {
 	LastName  string `json:"last_name" validate:"required"`
 }
 
+// AdminRegisterRequest represents admin registration request payload
+type AdminRegisterRequest struct {
+	Email     string `json:"email" validate:"required,email"`
+	Password  string `json:"password" validate:"required,min=6"`
+	FirstName string `json:"first_name" validate:"required"`
+	LastName  string `json:"last_name" validate:"required"`
+	Role      Role   `json:"role" validate:"required,oneof=admin user moderator"`
+}
+
 // LoginResponse โครงสร้างสำหรับการตอบกลับการเข้าสู่ระบบ
 type LoginResponse struct {
 	Token string `json:"token"`

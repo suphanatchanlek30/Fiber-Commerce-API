@@ -56,6 +56,38 @@ func (s *AuthServiceImpl) Register(req entities.RegisterRequest) (*entities.User
 	return user, nil
 }
 
+// AdminRegister ฟังก์ชันสำหรับลงทะเบียนผู้ใช้ใหม่เป็น admin
+func (s *AuthServiceImpl) AdminRegister(req entities.AdminRegisterRequest) (*entities.User, error) {
+	// เช็คถ้ามี user ที่มีอีเมลเดียวกันอยู่แล้ว
+	existingUser, _ := s.userRepo.GetByEmail(req.Email)
+	if existingUser != nil {
+		return nil, errors.New("user already exists")
+	}
+
+	// Hash รหัสผ่าน
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	// สร้าง user ใหม่ด้วย role ที่กำหนด
+	user := &entities.User{
+		Email:     req.Email,
+		Password:  hashedPassword,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Role:      req.Role, // ใช้ role ที่ส่งมา
+		IsActive:  true,
+	}
+
+	err = s.userRepo.Create(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 // Login ฟังก์ชันสำหรับเข้าสู่ระบบ
 func (s *AuthServiceImpl) Login(req entities.LoginRequest) (*entities.LoginResponse, error) {
 

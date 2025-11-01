@@ -1,5 +1,30 @@
 basePath: /
 definitions:
+  entities.AdminRegisterRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/entities.Role'
+        enum:
+        - admin
+        - user
+        - moderator
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - role
+    type: object
   entities.LoginRequest:
     properties:
       email:
@@ -109,6 +134,42 @@ paths:
       summary: Get admin dashboard
       tags:
       - Admin
+  /api/admin/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new admin user account
+      parameters:
+      - description: Registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.AdminRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entities.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Register a new admin user
+      tags:
+      - Authentication
   /api/auth/login:
     post:
       consumes:

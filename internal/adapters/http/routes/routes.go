@@ -34,4 +34,5 @@ func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 	admin.Use(middleware.AuthMiddleware())
 	admin.Use(middleware.RequireRole("admin"))
 	admin.Get("/dashboard", adminHandler.GetDashboard)
+	admin.Post("/register", authHandler.AdminRegister)
 }

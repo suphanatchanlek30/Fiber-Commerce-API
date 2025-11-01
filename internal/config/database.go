@@ -32,6 +32,12 @@ func SetupDatabase(config *Config) *gorm.DB {
 
 		// runMigration จะทำการ migrate ถ้าเงื่อนไขเป็นจริง
 		runMigrations(db)
+
+		// Seed admin user หลังจาก migration เสร็จ
+		if err := SeedAdminUser(db, config); err != nil {
+			log.Printf("Admin seeding failed: %v", err)
+		}
+
 	} else {
 		// แสดง message ที่ชัดเจนขึ้นตามสาเหตุ
 		autoMigrate := os.Getenv("AUTO_MIGRATE")
@@ -43,6 +49,11 @@ func SetupDatabase(config *Config) *gorm.DB {
 			log.Printf("Skipping database migration (production environment, set AUTO_MIGRATE=true to enable)")
 		} else {
 			log.Printf("Skipping database migration (set AUTO_MIGRATE=true to enable)")
+		}
+
+		// ลองสร้าง admin user แม้ว่าจะไม่ได้ migrate (กรณีที่ตารางมีอยู่แล้ว)
+		if err := SeedAdminUser(db, config); err != nil {
+			log.Printf("Admin seeding failed: %v", err)
 		}
 	}
 

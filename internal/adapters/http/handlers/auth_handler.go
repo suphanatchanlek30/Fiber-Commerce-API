@@ -125,3 +125,41 @@ func (h *AuthHandler) GetProfile(c *fiber.Ctx) error {
 
 	return c.JSON(user)
 }
+
+// ฟังก์ชันสำหรับลงทะเบียนผู้ใช้ใหม่เป็น admin
+// AdminRegister godoc
+// @Summary Register a new admin user
+// @Description Register a new admin user account
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body entities.AdminRegisterRequest true "Registration data"
+// @Success 201 {object} entities.User
+// @Failure 400 {object} map[string]string
+// @Failure 409 {object} map[string]string
+// @Router /api/admin/register [post]
+func (h *AuthHandler) AdminRegister(c *fiber.Ctx) error {
+	var req entities.AdminRegisterRequest
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	if err := utils.ValidateStruct(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	user, err := h.authService.AdminRegister(req)
+	if err != nil {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(user)
+}

@@ -3,26 +3,32 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
 
 // สร้างโครงสร้าง Config เพื่อเก็บค่าการตั้งค่าต่างๆ
 type Config struct {
-	AppEnv       string
-	AppPort      string
-	AppURL       string
-	DBHost       string
-	DBPort       string
-	DBUser       string
-	DBPassword   string
-	DBName       string
-	DBSSLMode    string
-	JWTSecret    string
-	JWTExpiresIn string
+	AppEnv         string
+	AppPort        string
+	AppURL         string
+	DBHost         string
+	DBPort         string
+	DBUser         string
+	DBPassword     string
+	DBName         string
+	DBSSLMode      string
+	JWTSecret      string
+	JWTExpiresIn   string
+	AdminEmail     string
+	AdminPassword  string
+	AdminFirstName string
+	AdminLastName  string
 }
 
 // LoadEnv โหลดตัวแปรสภาพแวดล้อมจากไฟล์ .env
@@ -48,9 +54,13 @@ func LoadConfig() (*Config, error) {
 		JWTExpiresIn: getEnv("JWT_EXPIRES_IN", "24"),
 
 		// ค่าที่ไม่ปลอดถัย default ต้องกำหนดใน .env
-		DBPassword: getEnv("DB_PASS", ""),
-		DBName:     getEnv("DB_NAME", ""),
-		JWTSecret:  getEnv("JWT_SECRET", ""),
+		DBPassword:     getEnv("DB_PASS", ""),
+		DBName:         getEnv("DB_NAME", ""),
+		JWTSecret:      getEnv("JWT_SECRET", ""),
+		AdminEmail:     getEnv("ADMIN_EMAIL", ""),
+		AdminPassword:  getEnv("ADMIN_PASSWORD", ""),
+		AdminFirstName: getEnv("ADMIN_FIRST_NAME", ""),
+		AdminLastName:  getEnv("ADMIN_LAST_NAME", ""),
 	}
 
 	// ตรวจสอบค่าที่จำเป็นต้องมี
@@ -79,6 +89,23 @@ func validateConfig(config *Config) error {
 		if config.DBSSLMode == "disable" {
 			log.Println("Warning: DB_SSL is set to disable in production")
 		}
+		if config.AdminEmail == "" {
+			return fmt.Errorf("ADMIN_EMAIL is required in production")
+		}
+		if config.AdminPassword == "" {
+			return fmt.Errorf("ADMIN_PASSWORD is required in production")
+		}
+		if config.AdminFirstName == "" {
+			return fmt.Errorf("ADMIN_FIRST_NAME is required in production")
+		}
+		if config.AdminLastName == "" {
+			return fmt.Errorf("ADMIN_LAST_NAME is required in production")
+		}
+	}
+
+	// ตรวจสอบรูปแบบ email (เฉพาะเมื่อมีค่า)
+	if config.AdminEmail != "" && !isValidEmail(config.AdminEmail) {
+		return errors.New("ADMIN_EMAIL format is invalid")
 	}
 
 	// ตรวจสอบค่าพื้นฐานที่ควรมีเสมอ
@@ -96,4 +123,18 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// ฟังก์ชั่น check email ว่ามีรูปแบบถูกต้องหรือไม่
+func isValidEmail(email string) bool {
+	if email == "" {
+		return false
+	}
+
+	// ตรวจสอบพื้นฐาน - ต้องมี @ และ . และไม่เริ่มหรือจบด้วย @
+	return len(email) > 0 && len(email) <= 254 &&
+		strings.Contains(email, "@") &&
+		strings.Contains(email, ".") &&
+		!strings.HasPrefix(email, "@") &&
+		!strings.HasSuffix(email, "@")
 }

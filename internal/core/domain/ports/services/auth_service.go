@@ -9,6 +9,8 @@ import (
 type AuthService interface {
 	// สร้างผู้ใช้ใหม่
 	Register(req entities.RegisterRequest) (*entities.User, error)
+	// สร้างผู้ดูแลระบบใหม่
+	AdminRegister(req entities.AdminRegisterRequest) (*entities.User, error)
 	// ผู้ใช้เข้าสู่ระบบ
 	Login(req entities.LoginRequest) (*entities.LoginResponse, error)
 	// ดึงข้อมูลผู้ใช้ตาม ID
