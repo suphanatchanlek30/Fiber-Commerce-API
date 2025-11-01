@@ -10,6 +10,9 @@ import (
 // Setup Route
 func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 
+	// สร้าง handler สำหรับ admin
+	adminHandler := handlers.NewAdminHandler()
+
 	// Swagger
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
@@ -30,9 +33,5 @@ func SetupRoutes(app *fiber.App, authHandler *handlers.AuthHandler) {
 	admin := api.Group("/admin")
 	admin.Use(middleware.AuthMiddleware())
 	admin.Use(middleware.RequireRole("admin"))
-	admin.Get("/dashboard", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "Welcome to the admin dashboard",
-		})
-	})
+	admin.Get("/dashboard", adminHandler.GetDashboard)
 }

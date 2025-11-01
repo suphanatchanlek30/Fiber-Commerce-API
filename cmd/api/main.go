@@ -14,9 +14,10 @@
 
 // @host localhost:3000
 // @BasePath /
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
+// @description JWT token สำหรับการยืนยันตัวตน ให้ใส่ token ในรูปแบบ Bearer <token>
 package main
 
 import (

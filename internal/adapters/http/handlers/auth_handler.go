@@ -107,7 +107,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 // @Tags User
 // @Accept json
 // @Produce json
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Success 200 {object} entities.User
 // @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
