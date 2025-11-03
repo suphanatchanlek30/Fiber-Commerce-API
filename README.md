@@ -132,7 +132,7 @@ fiber-ecommerce-api-day8/
 ### 1. Clone the repository
 ```bash
 git clone <repository-url>
-cd fiber-ecommerce-api-day8
+cd Fiber-Commerce-API
 ```
 
 ### 2. Install dependencies
@@ -541,5 +541,6 @@ export AUTO_MIGRATE=false
 
 ## 📞 Reference by ITGENIUS
 link course : [Full Stack Workshop Go with Fiber framework and NextJS](https://www.itgenius.co.th/online-courses/full-stack-go-fiber-framework-and-nextjs.html)
+
 
 ---
