@@ -12,14 +12,11 @@ import (
 	"gorm.io/gorm"
 )
 
-// SetupDatabase ตั้งค่าการเชื่อมต่อฐานข้อมูล
 func SetupDatabase(config *Config) *gorm.DB {
 
-	// สร้าง Data Source Name (DSN)
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		config.DBHost, config.DBUser, config.DBPassword, config.DBName, config.DBPort, config.DBSSLMode)
 
-	// Connect to the database
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
@@ -27,15 +24,15 @@ func SetupDatabase(config *Config) *gorm.DB {
 
 	log.Println("Database connected successfully")
 
-	// ตรวจสอบว่าควรทำการ migrate หรือไม่
-	if shoulRundMigratuion() {
+	// ตรวจสอบว่าต้องการ migrate หรือไม่
+	if shouldRunMigration() {
 
 		// runMigration จะทำการ migrate ถ้าเงื่อนไขเป็นจริง
-		runMigrations(db)
+		runMigration(db)
 
-		// Seed admin user หลังจาก migration เสร็จ
-		if err := SeedAdminUser(db, config); err != nil {
-			log.Printf("Admin seeding failed: %v", err)
+		// Seed database หลังจาก migration เสร็จ
+		if err := SeedDatabase(db, config); err != nil {
+			log.Printf("Database seeding failed: %v", err)
 		}
 
 	} else {
@@ -51,9 +48,9 @@ func SetupDatabase(config *Config) *gorm.DB {
 			log.Printf("Skipping database migration (set AUTO_MIGRATE=true to enable)")
 		}
 
-		// ลองสร้าง admin user แม้ว่าจะไม่ได้ migrate (กรณีที่ตารางมีอยู่แล้ว)
-		if err := SeedAdminUser(db, config); err != nil {
-			log.Printf("Admin seeding failed: %v", err)
+		// ลองสร้างข้อมูลตัวอย่าง แม้ว่าจะไม่ได้ migrate (กรณีที่ตารางมีอยู่แล้ว)
+		if err := SeedDatabase(db, config); err != nil {
+			log.Printf("Database seeding failed: %v", err)
 		}
 	}
 
@@ -61,66 +58,74 @@ func SetupDatabase(config *Config) *gorm.DB {
 
 }
 
-// สร้างฟังก์ชั่นตรวจสอบว่าควร migrate หรือไม่
-func shoulRundMigratuion() bool {
-	// ถ้ากำหนด AUTO_MIGRATE เป็น false ให้ไม่ migration เลย (ทุก environment)
+// สร้างฟังก์ชัน ตรวจสอบว่าควร migrate หรือไม่
+func shouldRunMigration() bool {
+	// ถ้ากำหนด AUTO_MIGRATE=false ให้ไม่ migrate เลย (ทุก environment)
 	if os.Getenv("AUTO_MIGRATE") == "false" {
 		return false
 	}
-
-	// ถ้ากำหนด AUTO_MIGRATE เป็น true ให้ migration เลย (ทุก environment)
+	// ถ้ากำหนด AUTO_MIGRATE=true ให้ migrate เลย (ทุก environment)
 	if os.Getenv("AUTO_MIGRATE") == "true" {
 		return true
 	}
-
 	// ถ้าไม่ได้กำหนด AUTO_MIGRATE ให้ใช้ default ตาม environment
-	// Development - migrate อัตโนมัติเสมอ
-	// Production - ไม่ต้อง migrate อัตโนมัติ
+	// Development - migrate อัตโนมัติ
 	if os.Getenv("APP_ENV") == "development" {
 		return true
 	}
-
-	// Production or อื่นๆ - ไม่ต้อง migrate อัตโนมัติ
+	// Production - ไม่ migrate อัตโนมัติ
 	return false
 }
 
-// ฟังก์ชั่นสำหรับ migration
-func runMigrations(db *gorm.DB) {
-	// เริ่มต้น migration
+// ฟังก์ชันสำหรับ migrate
+func runMigration(db *gorm.DB) {
 	log.Println("Starting database migration...")
 
-	// ตรวจสอบว่าต้องการ migrate หรือไม่
-	err := db.AutoMigrate(&models.User{})
-
-	// ตรวจสอบข้อผิดพลาด
+	// Migrate all models
+	err := db.AutoMigrate(
+		&models.Role{},
+		&models.Permission{},
+		&models.User{},
+		&models.Category{},
+		&models.Product{},
+		&models.ProductImage{},
+		&models.Cart{},
+		&models.CartItem{},
+		&models.Order{},
+		&models.OrderItem{},
+		&models.Transaction{},
+	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
-	// สำเร็จ
 	log.Println("Database migration completed successfully")
 }
 
 // ฟังก์ชันสำหรับ migrate แบบ manual (สำหรับ CLI)
-// คือ ไม่ตรวจสอบเงื่อนไข AUTO_MIGRATE หรือ APP_ENV ใดๆ แล้ว migrate ทันที
 func RunMigrationManual(config *Config) error {
-	// ตั้งค่าการเชื่อมต่อฐานข้อมูล
 	db := SetupDatabase(config)
 
-	// เริ่มต้น migration
 	log.Println("Running manual migration...")
 
-	// ทำการ migrate
-	err := db.AutoMigrate(&models.User{})
-
-	// ตรวจสอบข้อผิดพลาด
+	// Migrate all models
+	err := db.AutoMigrate(
+		&models.Role{},
+		&models.Permission{},
+		&models.User{},
+		&models.Category{},
+		&models.Product{},
+		&models.ProductImage{},
+		&models.Cart{},
+		&models.CartItem{},
+		&models.Order{},
+		&models.OrderItem{},
+		&models.Transaction{},
+	)
 	if err != nil {
 		return fmt.Errorf("migration failed: %v", err)
 	}
 
-	// สำเร็จ
 	log.Println("Manual migration completed successfully")
-
-	// คืนค่า nil เมื่อสำเร็จ
 	return nil
 }

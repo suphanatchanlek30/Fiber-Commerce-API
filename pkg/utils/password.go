@@ -25,12 +25,10 @@ func CheckPassword(password, hash string) bool {
 // ValidatePasswordComplexity ตรวจสอบความซับซ้อนของรหัสผ่าน
 // ต้องมีอย่างน้อย 8 ตัวอักษร, ตัวเลข, ตัวอักษร และอักขระพิเศษ
 func ValidatePasswordComplexity(password string) error {
-	// ตรวจสอบความยาวขั้นต่ำ
 	if len(password) < 8 {
 		return errors.New("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร")
 	}
 
-	// set ตัวแปรเพื่อตรวจสอบประเภทของตัวอักษร
 	var (
 		hasUpper   = false
 		hasLower   = false
@@ -41,7 +39,6 @@ func ValidatePasswordComplexity(password string) error {
 	// ตรวจสอบแต่ละตัวอักษรในรหัสผ่าน
 	for _, char := range password {
 		switch {
-		// unicode = แพ็กเกจสำหรับจัดการกับตัวอักษรในรูปแบบ Unicode
 		case unicode.IsUpper(char):
 			hasUpper = true
 		case unicode.IsLower(char):
