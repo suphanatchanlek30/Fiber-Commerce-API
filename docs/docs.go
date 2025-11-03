@@ -13,7 +13,7 @@ const docTemplate = `{
         "contact": {
             "name": "API Support",
             "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "email": "support@example.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -3391,7 +3391,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "JWT token สำหรับการยืนยันตัวตน ให้ใส่ token ในรูปแบบ Bearer \u003ctoken\u003e",
+            "description": "JWT token สำหรับการยืนยันตัวตน ให้ใส่ token ในรูปแบบ: Bearer \u003ctoken\u003e",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -3401,12 +3401,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "1.0.0",
 	Host:             "localhost:3000",
-	BasePath:         "/",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Fiber Auth API",
-	Description:      "Authentication API with Role-based Access Control",
+	Title:            "Go E-commerce API",
+	Description:      "API สำหรับระบบ E-commerce ที่พัฒนาด้วย Go Fiber",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

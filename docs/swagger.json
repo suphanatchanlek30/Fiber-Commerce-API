@@ -1,22 +1,22 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Authentication API with Role-based Access Control",
-        "title": "Fiber Auth API",
+        "description": "API สำหรับระบบ E-commerce ที่พัฒนาด้วย Go Fiber",
+        "title": "Go E-commerce API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
             "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "email": "support@example.com"
         },
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         },
-        "version": "1.0"
+        "version": "1.0.0"
     },
     "host": "localhost:3000",
-    "basePath": "/",
+    "basePath": "/api/v1",
     "paths": {
         "/api/admin/dashboard": {
             "get": {
@@ -3385,7 +3385,7 @@
     },
     "securityDefinitions": {
         "BearerAuth": {
-            "description": "JWT token สำหรับการยืนยันตัวตน ให้ใส่ token ในรูปแบบ Bearer \u003ctoken\u003e",
+            "description": "JWT token สำหรับการยืนยันตัวตน ให้ใส่ token ในรูปแบบ: Bearer \u003ctoken\u003e",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

@@ -1,4 +1,4 @@
-basePath: /
+basePath: /api/v1
 definitions:
   entities.AddToCartRequest:
     properties:
@@ -530,16 +530,16 @@ definitions:
 host: localhost:3000
 info:
   contact:
-    email: support@swagger.io
+    email: support@example.com
     name: API Support
     url: http://www.swagger.io/support
-  description: Authentication API with Role-based Access Control
+  description: API สำหรับระบบ E-commerce ที่พัฒนาด้วย Go Fiber
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Fiber Auth API
-  version: "1.0"
+  title: Go E-commerce API
+  version: 1.0.0
 paths:
   /api/admin/dashboard:
     get:
@@ -2144,7 +2144,7 @@ paths:
       - Users
 securityDefinitions:
   BearerAuth:
-    description: JWT token สำหรับการยืนยันตัวตน ให้ใส่ token ในรูปแบบ Bearer <token>
+    description: 'JWT token สำหรับการยืนยันตัวตน ให้ใส่ token ในรูปแบบ: Bearer <token>'
     in: header
     name: Authorization
     type: apiKey
