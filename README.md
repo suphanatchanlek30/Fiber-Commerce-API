@@ -540,6 +540,6 @@ export AUTO_MIGRATE=false
 - Database credentials
 
 ## 📞 Reference by ITGENIUS
-link course : [text](https://www.itgenius.co.th/online-courses/full-stack-go-fiber-framework-and-nextjs.html)
+link course : [Full Stack Workshop Go with Fiber framework and NextJS](https://www.itgenius.co.th/online-courses/full-stack-go-fiber-framework-and-nextjs.html)
 
 ---
