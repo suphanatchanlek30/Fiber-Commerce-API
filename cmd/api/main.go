@@ -26,9 +26,8 @@ import (
 	_ "github.com/suphanatchanlek30/fiber-commerce-api/docs"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/suphanatchanlek30/fiber-commerce-api/internal/adapters/http/handlers"
+	"github.com/suphanatchanlek30/fiber-commerce-api/internal/adapters/http/middleware"
 	"github.com/suphanatchanlek30/fiber-commerce-api/internal/adapters/http/routes"
 	"github.com/suphanatchanlek30/fiber-commerce-api/internal/adapters/persistence/repositories"
 	"github.com/suphanatchanlek30/fiber-commerce-api/internal/config"
@@ -36,13 +35,10 @@ import (
 )
 
 func main() {
-
-	// Load configurations
+	// Load configuration
 	cfg, err := config.LoadConfig()
-
-	// ตรวจสอบข้อผิดพลาดในการโหลดการตั้งค่า
 	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
 	// Setup database connection
@@ -50,12 +46,39 @@ func main() {
 
 	// Initialize repositories
 	userRepo := repositories.NewUserRepository(db)
+	roleRepo := repositories.NewRoleRepository(db)
+
+	categoryRepo := repositories.NewCategoryRepository(db)
+	productRepo := repositories.NewProductRepository(db)
+	cartRepo := repositories.NewCartRepository(db)
+	orderRepo := repositories.NewOrderRepository(db)
+	transactionRepo := repositories.NewTransactionRepository(db)
+	statsRepo := repositories.NewStatsRepository(db)
 
 	// Initialize services
-	authService := services.NewAuthService(userRepo)
+	authService := services.NewAuthService(userRepo, roleRepo)
+	userService := services.NewUserService(userRepo)
+	categoryService := services.NewCategoryService(categoryRepo)
+	productService := services.NewProductService(productRepo)
+	cartService := services.NewCartService(cartRepo)
+	orderService := services.NewOrderService(orderRepo)
+	paymentService := services.NewPaymentService(transactionRepo)
+	statsService := services.NewStatsService(statsRepo)
+
+	// Initialize middleware
+	authMW := middleware.NewAuthMiddleware(cfg.JWTSecret)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(authService)
+	authHandler := handlers.NewAuthHandler(authService, userService)
+	userHandler := handlers.NewUserHandler(userService)
+
+	// เพิ่ม handlers อื่นๆ
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	productHandler := handlers.NewProductHandler(productService)
+	cartHandler := handlers.NewCartHandler(cartService)
+	orderHandler := handlers.NewOrderHandler(orderService)
+	paymentHandler := handlers.NewPaymentHandler(paymentService)
+	statsHandler := handlers.NewStatsHandler(statsService)
 
 	// Initialize Fiber app
 	app := fiber.New(fiber.Config{
@@ -66,15 +89,21 @@ func main() {
 		},
 	})
 
-	// Middleware
-	app.Use(logger.New())
-	app.Use(cors.New())
-
-	// Setup routes
-	routes.SetupRoutes(app, authHandler)
+	// Initialize routes
+	routes := routes.NewRoutes(
+		authHandler,
+		userHandler,
+		categoryHandler,
+		productHandler,
+		cartHandler,
+		orderHandler,
+		paymentHandler,
+		statsHandler,
+		authMW,
+	)
+	routes.SetupRoutes(app)
 
 	// Start server
 	log.Printf("Server starting on port %s", cfg.AppPort)
 	log.Fatal(app.Listen(":" + cfg.AppPort))
-
 }
