@@ -30,8 +30,15 @@ func (s *AuthServiceImpl) Register(req entities.RegisterRequest) (*entities.User
 		return nil, errors.New("user already exists")
 	}
 
+	// ตรวจสอบความซับซ้อนของรหัสผ่าน
+	if err := utils.ValidatePassword(req.Password); err != nil {
+		return nil, err
+	}
+
 	// Hash รหัสผ่าน
 	hashedPassword, err := utils.HashPassword(req.Password)
+
+	// ตรวจสอบข้อผิดพลาดในการแฮชรหัสผ่าน
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +69,11 @@ func (s *AuthServiceImpl) AdminRegister(req entities.AdminRegisterRequest) (*ent
 	existingUser, _ := s.userRepo.GetByEmail(req.Email)
 	if existingUser != nil {
 		return nil, errors.New("user already exists")
+	}
+
+	// ตรวจสอบความซับซ้อนของรหัสผ่าน
+	if err := utils.ValidatePassword(req.Password); err != nil {
+		return nil, err
 	}
 
 	// Hash รหัสผ่าน
